@@ -25,8 +25,9 @@ class MyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       appBar: AppBar(
-        title: Text('Appbar Icon Menu'),
+        title: Text('Appbar test'),
         centerTitle: true,
         elevation: 0.0,
         leading: IconButton(
