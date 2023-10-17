@@ -38,6 +38,8 @@ class MyPage extends StatelessWidget {
         ),
       ),
       body: Text("git test1"),
+      body: Text("git test1"),
+      body: Text("git test1"),
     );
   }
 }
