@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:g_vesion/scrennC.dart';
-import 'package:g_vesion/screenD.dart';
+import 'package:g_vesion/settingPage.dart';
+import 'package:g_vesion/newProjectpage.dart';
 import 'package:get/get.dart';
 
-import 'scrennB.dart';
+import 'projectPage.dart';
 
 void main() => runApp(ScreenA());
 

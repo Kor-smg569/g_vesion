@@ -1,9 +1,9 @@
 import "package:get/get.dart";
 import 'package:flutter/material.dart';
 //import 'package:push_named/ScreenA.dart';
-import 'screenA.dart';
-import 'scrennB.dart';
-import 'scrennC.dart';
+import 'startPage.dart';
+import 'projectPage.dart';
+import 'settingPage.dart';
 
 void main () => runApp(MyApp());
 
