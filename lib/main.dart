@@ -34,6 +34,7 @@ class MyPage extends StatelessWidget {
           icon: Icon(Icons.menu),
           onPressed: () {
             print('menu button is clicked');
+            print('Git Test');
           },
         ),
       ),
