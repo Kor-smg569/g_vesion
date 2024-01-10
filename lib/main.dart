@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
+import 'add_project_screen.dart';
 
 void main() {
   runApp(const MyApp());
+}
+
+class Project {
+  String name;
+  String? imageUrl;
+
+  Project({required this.name, this.imageUrl});
 }
 
 class MyApp extends StatelessWidget {
@@ -20,8 +28,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyPage extends StatelessWidget {
+class MyPage extends StatefulWidget {
   const MyPage({super.key});
+
+  @override
+  _MyPageState createState() => _MyPageState();
+}
+
+class _MyPageState extends State<MyPage> {
+  List<Project> projects = [];
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +51,20 @@ class MyPage extends StatelessWidget {
         elevation: 0.0,
         actions: [
           GestureDetector(
-            onTap: () {
-              print("right bT");
+            onTap: () async {
+              // 플러스 버튼이 눌렸을 때 다이얼로그를 통해 프로젝트 정보 입력 받기
+              Project? newProject = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddProjectScreen(),
+                ),
+              );
+
+              if (newProject != null) {
+                setState(() {
+                  projects.add(newProject);
+                });
+              }
             },
             child: const Padding(
               padding: EdgeInsets.all(10.0),
@@ -52,22 +79,30 @@ class MyPage extends StatelessWidget {
       ),
       body: Container(
         color: const Color(0xffD3D3D3),
-        child: const Center(
-          child: Text("프로젝트 목록"),
+        child: ListView.builder(
+          itemCount: projects.length,
+          itemBuilder: (context, index) {
+            return ListTile(
+              title: Text(projects[index].name),
+              leading: projects[index].imageUrl != null
+                  ? CircleAvatar(
+                backgroundImage: NetworkImage(projects[index].imageUrl!),
+              )
+                  : CircleAvatar(),
+            );
+          },
         ),
       ),
-
-
-
-
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.view_list),
-              label: '프로젝트 목록'),
+            icon: Icon(Icons.view_list),
+            label: '프로젝트 목록',
+          ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.unarchive),
-              label: '공유함'),
+            icon: Icon(Icons.unarchive),
+            label: '공유함',
+          ),
         ],
       ),
     );
