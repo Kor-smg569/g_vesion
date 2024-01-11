@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'add_project_screen.dart';
 
 void main() {
@@ -7,13 +9,14 @@ void main() {
 
 class Project {
   String name;
-  String? imageUrl;
+  File? imageUrl;
+  DateTime? creationDate;
 
-  Project({required this.name, this.imageUrl});
+  Project({required this.name, this.imageUrl, this.creationDate});
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,15 +24,16 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'G-VISION',
       theme: ThemeData(
-          useMaterial3: false,
-          colorScheme: ColorScheme.fromSeed(seedColor: Color(0xff4CAF50))),
+        useMaterial3: false,
+        colorScheme: ColorScheme.fromSeed(seedColor: Color(0xff4CAF50)),
+      ),
       home: MyPage(),
     );
   }
 }
 
 class MyPage extends StatefulWidget {
-  const MyPage({super.key});
+  const MyPage({Key? key}) : super(key: key);
 
   @override
   _MyPageState createState() => _MyPageState();
@@ -44,15 +48,13 @@ class _MyPageState extends State<MyPage> {
       appBar: AppBar(
         title: const Align(
           alignment: Alignment.centerLeft,
-          child: Text(
-            'G-VISION',
-          ),
+          child: Text('G-VISION'),
         ),
         elevation: 0.0,
         actions: [
           GestureDetector(
             onTap: () async {
-              // 플러스 버튼이 눌렸을 때 다이얼로그를 통해 프로젝트 정보 입력 받기
+              // Navigate to AddProjectScreen and get the new project
               Project? newProject = await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -62,7 +64,10 @@ class _MyPageState extends State<MyPage> {
 
               if (newProject != null) {
                 setState(() {
-                  projects.add(newProject);
+                  // Add the new project to the beginning of the list
+                  projects.insert(0, newProject);
+                  // Sort the projects in reverse order based on creationDate
+                  projects.sort((a, b) => b.creationDate!.compareTo(a.creationDate!));
                 });
               }
             },
@@ -82,13 +87,35 @@ class _MyPageState extends State<MyPage> {
         child: ListView.builder(
           itemCount: projects.length,
           itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(projects[index].name),
-              leading: projects[index].imageUrl != null
-                  ? CircleAvatar(
-                backgroundImage: NetworkImage(projects[index].imageUrl!),
-              )
-                  : CircleAvatar(),
+            return Container(
+              width: 310,
+              height: 100,
+              margin: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: ListTile(
+                title: Text(projects[index].name),
+                subtitle: projects[index].creationDate != null
+                    ? Text('Creation Date: ${projects[index].creationDate}')
+                    : const Text('Creation Date: N/A'),
+                leading: Container(
+                  width: 90,
+                  height: 90,
+                  padding: EdgeInsets.all(5.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    color: Colors.grey[300],
+                  ),
+                  child: projects[index].imageUrl != null
+                      ? Image.file(
+                    projects[index].imageUrl!,
+                    fit: BoxFit.cover,
+                  )
+                      : const SizedBox(), // Null safety: Use SizedBox for an empty container
+                ),
+              ),
             );
           },
         ),

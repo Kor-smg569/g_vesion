@@ -1,4 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
 import 'main.dart';
 
 class AddProjectScreen extends StatefulWidget {
@@ -8,44 +11,69 @@ class AddProjectScreen extends StatefulWidget {
 
 class _AddProjectScreenState extends State<AddProjectScreen> {
   TextEditingController nameController = TextEditingController();
-  TextEditingController imageUrlController = TextEditingController();
+  File? selectedImage;
+
+  Future<void> _getImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        selectedImage = File(pickedFile.path);
+      }
+    });
+  }
+
+  Future<void> _createProject() async {
+    if (nameController.text.isNotEmpty) {
+      Project newProject = Project(
+        name: nameController.text,
+        imageUrl: selectedImage,
+        creationDate: DateTime.now(), // Set the creation date
+      );
+
+      Navigator.pop(context, newProject);
+    } else {
+      // 이름이 비어있을 경우 경고 표시
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('프로젝트 이름을 입력하세요.'),
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('프로젝트 추가'),
+        title: Text('Add Project'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: '프로젝트 이름'),
+              decoration: InputDecoration(labelText: 'Project Name'),
             ),
-            TextField(
-              controller: imageUrlController,
-              decoration: InputDecoration(labelText: '이미지 URL (선택)'),
-            ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             ElevatedButton(
-              onPressed: () {
-                String name = nameController.text;
-                String? imageUrl =
-                imageUrlController.text.isNotEmpty ? imageUrlController.text : null;
-
-                if (name.isNotEmpty) {
-                  Navigator.of(context).pop(Project(name: name, imageUrl: imageUrl));
-                } else {
-                  // 이름이 비어있을 경우 경고 표시
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('프로젝트 이름을 입력하세요.'),
-                  ));
-                }
-              },
-              child: Text('프로젝트 생성'),
+              onPressed: _getImage,
+              child: Text('Select Image'),
+            ),
+            const SizedBox(height: 16.0),
+            selectedImage != null
+                ? Image.file(
+              selectedImage!,
+              height: 150,
+              fit: BoxFit.cover,
+            )
+                : const SizedBox(height: 150), // Placeholder for the selected image
+            const SizedBox(height: 16.0),
+            ElevatedButton(
+              onPressed: _createProject,
+              child: Text('Add Project'),
             ),
           ],
         ),
