@@ -54,7 +54,6 @@ class _MyPageState extends State<MyPage> {
         actions: [
           GestureDetector(
             onTap: () async {
-              // Navigate to AddProjectScreen and get the new project
               Project? newProject = await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -64,10 +63,9 @@ class _MyPageState extends State<MyPage> {
 
               if (newProject != null) {
                 setState(() {
-                  // Add the new project to the beginning of the list
                   projects.insert(0, newProject);
-                  // Sort the projects in reverse order based on creationDate
-                  projects.sort((a, b) => b.creationDate!.compareTo(a.creationDate!));
+                  projects.sort(
+                          (a, b) => b.creationDate!.compareTo(a.creationDate!));
                 });
               }
             },
@@ -87,33 +85,120 @@ class _MyPageState extends State<MyPage> {
         child: ListView.builder(
           itemCount: projects.length,
           itemBuilder: (context, index) {
-            return Container(
-              width: 310,
-              height: 100,
-              margin: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: ListTile(
-                title: Text(projects[index].name),
-                subtitle: projects[index].creationDate != null
-                    ? Text('Creation Date: ${projects[index].creationDate}')
-                    : const Text('Creation Date: N/A'),
-                leading: Container(
-                  width: 90,
-                  height: 90,
-                  padding: EdgeInsets.all(5.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8.0),
-                    color: Colors.grey[300],
-                  ),
-                  child: projects[index].imageUrl != null
-                      ? Image.file(
-                    projects[index].imageUrl!,
-                    fit: BoxFit.cover,
-                  )
-                      : const SizedBox(), // Null safety: Use SizedBox for an empty container
+            return Card(
+              child: Container(
+                width: double.infinity,
+                height: 120.0,
+                alignment: Alignment.center,
+                child: Row(
+                  children: [
+                    Container(
+                      width: 90,
+                      height: 90,
+                      margin: EdgeInsets.all(10.0),
+                      padding: EdgeInsets.all(5.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4.0),
+                        color: Colors.grey[300],
+                      ),
+                      child: projects[index].imageUrl != null
+                          ? AspectRatio(
+                        aspectRatio: 1.0, // 1:1 비율로 유지
+                        child: Image.file(
+                          projects[index].imageUrl!,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                          : const SizedBox(), // Null safety: Use SizedBox for an empty container
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: EdgeInsets.all(10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              projects[index].name,
+                              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 8.0),
+                            projects[index].creationDate != null
+                                ? Text('Creation Date: ${projects[index].creationDate}')
+                                : const Text('Creation Date: N/A'),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.all(15.0),
+                      child: PopupMenuButton(
+                        itemBuilder: (BuildContext context) {
+                          return [
+                            PopupMenuItem(
+                              child: ListTile(
+                                leading: Icon(Icons.edit),
+                                title: Text('이름 편집'),
+                                onTap: () async {
+                                  String? editedName = await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      String newName = projects[index].name;
+                                      return AlertDialog(
+                                        title: Text('프로젝트 이름 편집'),
+                                        content: TextField(
+                                          controller: TextEditingController(text: newName),
+                                          onChanged: (value) {
+                                            newName = value;
+                                          },
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context); // 취소 버튼
+                                            },
+                                            child: Text('취소'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () {
+                                              // 수정된 이름을 가져와서 저장하는 코드
+                                              Navigator.pop(context, newName);
+                                            },
+                                            child: Text('확인'),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+
+                                  if (editedName != null) {
+                                    setState(() {
+                                      projects[index].name = editedName;
+                                    });
+                                  }
+
+                                  Navigator.pop(context); // 팝업 메뉴 닫기
+                                },
+                              ),
+                            ),
+                            PopupMenuItem(
+                              child: ListTile(
+                                leading: Icon(Icons.delete),
+                                title: Text('프로젝트 삭제'),
+                                onTap: () {
+                                  // 프로젝트 삭제 액션을 처리하는 코드
+                                  setState(() {
+                                    projects.removeAt(index);
+                                  });
+                                  Navigator.pop(context); // 팝업 메뉴 닫기
+                                },
+                              ),
+                            ),
+                          ];
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
