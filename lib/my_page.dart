@@ -7,6 +7,7 @@ import 'project_data.dart';
 import 'project_creation_step1.dart';
 import 'project_creation_step2.dart';
 import 'project_creation_step3.dart';
+import 'project_detail_page.dart';
 
 class MyPage extends StatefulWidget {
   @override
@@ -53,6 +54,12 @@ class _MyPageState extends State<MyPage> {
     ));
   }
 
+  void _openProjectDetails(Project project) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => ProjectDetailPage(project: project),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,6 +80,7 @@ class _MyPageState extends State<MyPage> {
           )
         ],
       ),
+      backgroundColor: Colors.grey[300],
       body: Consumer<ProjectData>(
         builder: (context, projectData, child) {
           return ListView.builder(
@@ -100,17 +108,23 @@ class _MyPageState extends State<MyPage> {
   }
 
   Widget _buildProjectCard(BuildContext context, Project project, int index) {
-    return Card(
-      child: Container(
-        width: double.infinity,
-        height: 120.0,
-        alignment: Alignment.center,
-        child: Row(
-          children: [
-            _buildImageContainer(project),
-            _buildProjectInfo(project),
-            _buildPopupMenuButton(context, index),
-          ],
+    return InkWell(
+      onTap: () => _openProjectDetails(project),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Container(
+          width: double.infinity,
+          height: 120.0,
+          alignment: Alignment.center,
+          child: Row(
+            children: [
+              _buildImageContainer(project),
+              _buildProjectInfo(project),
+              _buildPopupMenuButton(context, index),
+            ],
+          ),
         ),
       ),
     );
@@ -124,13 +138,13 @@ class _MyPageState extends State<MyPage> {
       padding: const EdgeInsets.all(5.0),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4.0),
-        color: Colors.grey[300],
+        color: Colors.grey[200],
       ),
       child: project.imageUrl != null
           ? AspectRatio(
-        aspectRatio: 1.0,
-        child: Image.file(File(project.imageUrl!), fit: BoxFit.cover),
-      )
+              aspectRatio: 1.0,
+              child: Image.file(File(project.imageUrl!), fit: BoxFit.cover),
+            )
           : const SizedBox(),
     );
   }
@@ -145,7 +159,8 @@ class _MyPageState extends State<MyPage> {
           children: [
             Text(
               project.name,
-              style: const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              style:
+                  const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8.0),
             Text(
@@ -190,7 +205,8 @@ class _MyPageState extends State<MyPage> {
   Future<void> _editProjectName(BuildContext context, int index) async {
     final projectData = Provider.of<ProjectData>(context, listen: false);
     final project = projectData.projects[index];
-    TextEditingController _nameEditController = TextEditingController(text: project.name);
+    TextEditingController _nameEditController =
+        TextEditingController(text: project.name);
 
     String? newName = await showDialog<String>(
       context: context,
