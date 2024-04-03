@@ -8,6 +8,7 @@ import 'project_creation_step1.dart';
 import 'project_creation_step2.dart';
 import 'project_creation_step3.dart';
 import 'project_detail_page.dart';
+import 'shared_projects_page.dart'; // 추가
 
 class MyPage extends StatefulWidget {
   @override
@@ -60,6 +61,13 @@ class _MyPageState extends State<MyPage> {
     ));
   }
 
+  // 공유함 페이지로 이동하는 함수
+  void _openSharedProjectsPage() {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (context) => SharedProjectsPage(), // SharedProjectsPage로 이동
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,6 +111,11 @@ class _MyPageState extends State<MyPage> {
             label: '공유함',
           ),
         ],
+        onTap: (int index) {
+          if (index == 1) {
+            _openSharedProjectsPage(); // 공유함 페이지로 이동
+          }
+        },
       ),
     );
   }
@@ -142,9 +155,9 @@ class _MyPageState extends State<MyPage> {
       ),
       child: project.imageUrl != null
           ? AspectRatio(
-              aspectRatio: 1.0,
-              child: Image.file(File(project.imageUrl!), fit: BoxFit.cover),
-            )
+        aspectRatio: 1.0,
+        child: Image.file(File(project.imageUrl!), fit: BoxFit.cover),
+      )
           : const SizedBox(),
     );
   }
@@ -160,7 +173,7 @@ class _MyPageState extends State<MyPage> {
             Text(
               project.name,
               style:
-                  const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+              const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8.0),
             Text(
@@ -206,7 +219,7 @@ class _MyPageState extends State<MyPage> {
     final projectData = Provider.of<ProjectData>(context, listen: false);
     final project = projectData.projects[index];
     TextEditingController _nameEditController =
-        TextEditingController(text: project.name);
+    TextEditingController(text: project.name);
 
     String? newName = await showDialog<String>(
       context: context,
